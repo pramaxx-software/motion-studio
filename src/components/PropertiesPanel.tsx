@@ -145,7 +145,7 @@ export const PropertiesPanel: React.FC = () => {
             <textarea
               readOnly
               value={jsonOutput}
-              className="flex-1 min-h-[350px] w-full bg-slate-950 border border-slate-800 font-mono text-[11px] text-indigo-300 p-3 rounded focus:outline-none select-all"
+              className="flex-1 min-h-87.5 w-full bg-slate-950 border border-slate-800 font-mono text-[11px] text-indigo-300 p-3 rounded focus:outline-none select-all"
             />
           </div>
         )}

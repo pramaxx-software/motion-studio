@@ -219,7 +219,7 @@ export const Timeline: React.FC = () => {
             onPointerDown={startScrubberDrag}
             className="absolute top-0 bottom-0 w-0.5 bg-amber-400 z-30 cursor-ew-resize -translate-x-1/2 pointer-events-auto"
           >
-            <div className="w-3 h-3 bg-amber-400 rotate-45 -translate-x-[5px] -translate-y-1 rounded-sm shadow-md" />
+            <div className="w-3 h-3 bg-amber-400 rotate-45 -translate-x-1.25 -translate-y-1 rounded-sm shadow-md" />
           </div>
         )}
       </div>

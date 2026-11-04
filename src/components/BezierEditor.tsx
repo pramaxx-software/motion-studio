@@ -95,7 +95,7 @@ export const BezierEditor: React.FC<Props> = ({ easing, onChange }) => {
       </div>
 
       {/* Visual Canvas (SVG) */}
-      <div className="relative w-full aspect-square max-w-[200px] mx-auto bg-slate-950 rounded border border-slate-800 overflow-hidden select-none">
+      <div className="relative w-full aspect-square max-w-50 mx-auto bg-slate-950 rounded border border-slate-800 overflow-hidden select-none">
         <svg
           ref={svgRef}
           viewBox="0 0 200 200"
@@ -236,7 +236,7 @@ export const BezierEditor: React.FC<Props> = ({ easing, onChange }) => {
         <button
           type="button"
           onClick={() => applyPreset([0.34, 1.56, 0.64, 1])}
-          className="text-[10px] px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 text-amber-400"
+          className="text-[10px] px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300"
         >
           Bounce
         </button>
