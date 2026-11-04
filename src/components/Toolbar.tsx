@@ -47,7 +47,7 @@ export const Toolbar: React.FC = () => {
         showToast('Motion Berhasil Diperbarui!');
       } else {
         // POST /api/motions
-        const res = await apiFetch<{ id: number }>('/motions', {
+        const res = await apiFetch<{ id: number }>('/motion/create', {
           method: 'POST',
           body: JSON.stringify({
             name: motion.name,
