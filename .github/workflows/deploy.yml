@@ -1,0 +1,140 @@
+name: Build and Deploy Vite
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy to Ubuntu 22.04
+    runs-on: ubuntu-22.04
+    environment: production
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Vite application
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          test -d dist
+          test -f dist/index.html
+          echo "Vite build completed successfully."
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Configure SSH
+        env:
+          KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy build to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH }}
+        run: |
+          set -Eeuo pipefail
+
+          echo "=== Deployment Configuration ==="
+
+          : "${VPS_HOST:?Missing VPS_HOST}"
+          : "${VPS_USER:?Missing VPS_USER}"
+          : "${DEPLOY_PATH:?Missing VPS_DEPLOY_PATH}"
+
+          PORT="${VPS_PORT:-22}"
+
+          if ! [[ "$PORT" =~ ^[0-9]+$ ]] || \
+             (( PORT < 1 || PORT > 65535 )); then
+            echo "ERROR: Invalid VPS_PORT"
+            exit 1
+          fi
+
+          case "$DEPLOY_PATH" in
+            /*) ;;
+            *)
+              echo "ERROR: DEPLOY_PATH must be absolute"
+              exit 1
+              ;;
+          esac
+
+          echo "Host: $VPS_HOST"
+          echo "User: $VPS_USER"
+          echo "Port: $PORT"
+          echo "Deploy path: $DEPLOY_PATH"
+
+          echo "=== Checking Build ==="
+
+          test -f dist/index.html || {
+            echo "ERROR: dist/index.html not found"
+            exit 1
+          }
+
+          echo "=== Checking SSH ==="
+
+          SSH_OPTS=(
+            -p "$PORT"
+            -o BatchMode=yes
+            -o StrictHostKeyChecking=yes
+            -o ConnectTimeout=15
+          )
+
+          REMOTE="${VPS_USER}@${VPS_HOST}"
+
+          ssh "${SSH_OPTS[@]}" "$REMOTE" \
+            "echo 'SSH connection successful'"
+
+          echo "=== Checking Remote Directory ==="
+
+          ssh "${SSH_OPTS[@]}" "$REMOTE" \
+            "mkdir -p -- '$DEPLOY_PATH' && test -w '$DEPLOY_PATH'"
+
+          echo "=== Checking Remote Rsync ==="
+
+          ssh "${SSH_OPTS[@]}" "$REMOTE" \
+            "command -v rsync"
+
+          echo "=== Deploying Files ==="
+
+          rsync -az \
+            --delete \
+            --delay-updates \
+            --human-readable \
+            --itemize-changes \
+            -e "ssh -p $PORT -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15" \
+            dist/ \
+            "$REMOTE:$DEPLOY_PATH/"
+
+          echo "=== Deployment Successful ==="
+
+      - name: Deployment complete
+        run: echo "Deployment completed successfully."
