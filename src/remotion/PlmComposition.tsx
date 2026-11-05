@@ -14,7 +14,6 @@ interface Props {
 
 export const PlmComposition: React.FC<Props> = ({
   motion,
-  previewLabel = 'LOGO',
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
