@@ -10,6 +10,7 @@ export const KeyframeInspector: React.FC = () => {
     selectedKeyframeIndex,
     updateKeyframe,
     deleteKeyframe,
+    setCurrentT,
   } = useEditorStore();
 
   if (
@@ -30,6 +31,8 @@ export const KeyframeInspector: React.FC = () => {
   const handleTChange = (newT: number) => {
     const clampedT = Math.max(0, Math.min(1, newT));
     updateKeyframe(selectedTrack, selectedKeyframeIndex, { t: clampedT });
+    // Snap preview canvas ke posisi t keyframe yang sedang di-edit
+    setCurrentT(clampedT);
   };
 
   const handleHoldToggle = (hold: boolean) => {
@@ -87,7 +90,7 @@ export const KeyframeInspector: React.FC = () => {
         </div>
       </div>
 
-      {/* Input Nilai (v) sesuai jenis track */}
+      {/* Input Nilai (v) Realtime Slider */}
       <div className="flex flex-col gap-3 pt-2 border-t border-slate-800">
         <label className="text-xs text-slate-300 font-medium">Value (v)</label>
 

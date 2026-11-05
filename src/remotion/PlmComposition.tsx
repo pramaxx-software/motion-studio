@@ -2,7 +2,7 @@ import React from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from 'remotion';
 import { computeFrameState } from '../engine/interpolate';
 import type { PlmMotion } from '../types/plm';
-
+import LogoPramaxx from "../assets/pramaxx.png"
 export const PREVIEW_FPS = 30;
 export const CANVAS_WIDTH = 400;
 export const CANVAS_HEIGHT = 600;
@@ -70,7 +70,7 @@ export const PlmComposition: React.FC<Props> = ({
         <div
           style={{
             padding: '12px 24px',
-            background: '#e94560',
+            background: '#000000',
             color: '#fff',
             fontFamily: 'sans-serif',
             fontSize: 20,
@@ -80,7 +80,7 @@ export const PlmComposition: React.FC<Props> = ({
             whiteSpace: 'nowrap',
           }}
         >
-          {previewLabel}
+          <img src={LogoPramaxx} alt="" />
         </div>
       </div>
     </AbsoluteFill>

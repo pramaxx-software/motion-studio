@@ -127,6 +127,8 @@ jobs:
 
           rsync -az \
             --delete \
+            --exclude='.env' \
+            --exclude='.env.*' \
             --delay-updates \
             --human-readable \
             --itemize-changes \

@@ -18,7 +18,6 @@ export const Timeline: React.FC = () => {
 
   const trackContainerRef = useRef<HTMLDivElement>(null);
 
-  // Shortcut keyboard: Hapus keyframe terpilih saat tombol Delete / Backspace ditekan
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
@@ -74,6 +73,7 @@ export const Timeline: React.FC = () => {
     }
 
     addKeyframe(track, newKf);
+    setCurrentT(t);
   };
 
   const startScrubberDrag = (e: React.PointerEvent) => {
@@ -120,7 +120,10 @@ export const Timeline: React.FC = () => {
       if (!trackContainerRef.current) return;
       const rect = trackContainerRef.current.getBoundingClientRect();
       const newT = Math.max(0, Math.min(1, (moveEvent.clientX - rect.left) / rect.width));
-      updateKeyframe(track, index, { t: Number(newT.toFixed(4)) });
+      const roundedT = Number(newT.toFixed(4));
+      updateKeyframe(track, index, { t: roundedT });
+      // Update currentT real-time saat diamond di-drag
+      setCurrentT(roundedT);
     };
 
     const onPointerUp = (upEvent: PointerEvent) => {
@@ -180,6 +183,7 @@ export const Timeline: React.FC = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         selectKeyframe(track, idx);
+                        setCurrentT(kf.t);
                       }}
                       className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rotate-45 cursor-grab active:cursor-grabbing transition-transform z-10 ${
                         isSelected

@@ -127,6 +127,7 @@ export const PropertiesPanel: React.FC = () => {
               <input
                 type="number"
                 min="1"
+                readOnly
                 value={motion.version}
                 onChange={(e) =>
                   setMotionField('version', Math.max(1, parseInt(e.target.value, 10) || 1))
